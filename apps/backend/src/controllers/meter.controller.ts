@@ -363,7 +363,7 @@ export const updateReading = async (req: AuthRequest, res: Response) => {
     // Check permission
     const isOwner = reading.userId.toString() === userId
     let isRoomLandlord = false
-    if (isLandlord && reading.roomId) {
+    if (user?.role === 'landlord' && reading.roomId) {
       const room = await Room.findById(reading.roomId)
       isRoomLandlord = room?.landlordId.toString() === userId
     }

@@ -55,7 +55,7 @@ export default function Register() {
       
       // Show success message with free trial info for tenants
       if (formData.role === 'tenant') {
-        toast.success('🎉 Đăng ký thành công! Bạn được tặng FREE 2 tháng Gói Cơ Bản!', {
+        toast.success('Đăng ký thành công! Bạn được tặng FREE 2 tháng Gói Cơ Bản!', {
           duration: 5000,
         })
       } else {

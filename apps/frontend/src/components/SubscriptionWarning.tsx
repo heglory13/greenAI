@@ -45,7 +45,7 @@ export default function SubscriptionWarning() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="text-red-600 flex-shrink-0 mt-0.5" size={24} />
           <div className="flex-1">
-            <h3 className="font-bold text-red-900 mb-1">⚠️ Gói dịch vụ của bạn đã hết hạn!</h3>
+            <h3 className="font-bold text-red-900 mb-1">Gói dịch vụ của bạn đã hết hạn!</h3>
             <p className="text-sm text-red-800 mb-3">
               Gói <strong>{(user as any)?.subscriptionPlan}</strong> đã hết hạn. Một số tính năng có thể bị giới hạn. 
               Vui lòng gia hạn để tiếp tục sử dụng đầy đủ tính năng.

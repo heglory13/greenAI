@@ -33,11 +33,11 @@ const tenantPlans = [
       'Chụp ảnh đồng hồ (OCR tự động)',
       'Biểu đồ phân tích tiêu thụ',
       'Xem hóa đơn chi tiết',
-      '📄 Xuất PDF hóa đơn',
-      '🤖 AI Chatbot tư vấn',
-      '🤖 AI phân tích tiêu thụ',
-      '🤖 Phát hiện bất thường',
-      '🤖 Gợi ý tiết kiệm thông minh'
+      'Xuất PDF hóa đơn',
+      'AI Chatbot tư vấn',
+      'AI phân tích tiêu thụ',
+      'Phát hiện bất thường',
+      'Gợi ý tiết kiệm thông minh'
     ],
     limitations: [],
     highlighted: true,
@@ -76,7 +76,7 @@ const landlordPlans = [
       'Quản lý người thuê',
       'Lịch sử chỉ số không giới hạn',
       'Chụp ảnh đồng hồ (OCR)',
-      '🤖 AI Chatbot tư vấn'
+      'AI Chatbot tư vấn'
     ],
     limitations: [
       'Không có biểu đồ phân tích chi tiết',
@@ -93,12 +93,12 @@ const landlordPlans = [
     features: [
       'Quản lý tối đa 20 phòng',
       'Tất cả tính năng Starter',
-      '📊 Biểu đồ phân tích chi tiết',
-      '📊 Phân tích theo ngày/tháng',
-      '📊 Xem xu hướng tiêu thụ',
-      '🤖 AI phân tích tiêu thụ',
-      '🤖 Phát hiện bất thường tự động',
-      '🤖 Tư vấn tối ưu chi phí'
+      'Biểu đồ phân tích chi tiết',
+      'Phân tích theo ngày/tháng',
+      'Xem xu hướng tiêu thụ',
+      'AI phân tích tiêu thụ',
+      'Phát hiện bất thường tự động',
+      'Tư vấn tối ưu chi phí'
     ],
     limitations: [],
     highlighted: true,
@@ -113,9 +113,9 @@ const landlordPlans = [
       'Tất cả tính năng Professional',
       'Quản lý không giới hạn người thuê',
       'Xem tất cả lịch sử',
-      '📄 Xuất hóa đơn PDF',
-      '📄 Xuất báo cáo PDF',
-      '💬 Chat trực tiếp với admin',
+      'Xuất hóa đơn PDF',
+      'Xuất báo cáo PDF',
+      'Chat trực tiếp với admin',
       'Hỗ trợ ưu tiên'
     ],
     limitations: [],
@@ -271,7 +271,12 @@ export default function Pricing() {
       return
     }
 
-    // Paid plan - use PayOS
+    // Paid plan - payment temporarily disabled for demo
+    toast.error('Chức năng thanh toán đang được bảo trì. Vui lòng liên hệ admin.')
+    return
+
+    // Paid plan - use PayOS (hidden for demo)
+    /*
     setLoading(true)
     try {
       const response = await api.post('/payment/create', {
@@ -291,6 +296,7 @@ export default function Pricing() {
       toast.error(error.response?.data?.error || 'Không thể tạo thanh toán')
       setLoading(false)
     }
+    */
   }
 
   return (
@@ -456,7 +462,7 @@ export default function Pricing() {
                   <p className="text-xs sm:text-sm text-red-600 mt-1">{voucherError}</p>
                 )}
                 {voucherDiscount > 0 && (
-                  <p className="text-xs sm:text-sm text-green-600 mt-1">✓ Voucher giảm {voucherDiscount}% đã được áp dụng</p>
+                  <p className="text-xs sm:text-sm text-green-600 mt-1">Voucher giảm {voucherDiscount}% đã được áp dụng</p>
                 )}
               </div>
 
@@ -466,17 +472,26 @@ export default function Pricing() {
               </div>
 
               {selectedPlan.price > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-xs sm:text-sm text-yellow-800">
+                    Chức năng thanh toán online đang bảo trì. Vui lòng liên hệ admin để kích hoạt gói.
+                  </p>
+                </div>
+              )}
+              {/* Hidden for demo
+              {selectedPlan.price > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-xs sm:text-sm text-blue-800">
                     💳 Thanh toán qua PayOS - Hỗ trợ Momo, VNPay, Chuyển khoản ngân hàng
                   </p>
                 </div>
               )}
+              */}
 
               {selectedPlan.price === 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <p className="text-xs sm:text-sm text-green-800">
-                    ✓ Gói miễn phí - Không cần thanh toán
+                    Gói miễn phí - Không cần thanh toán
                   </p>
                 </div>
               )}

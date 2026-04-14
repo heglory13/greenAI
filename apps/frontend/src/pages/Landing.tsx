@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Shield, BarChart3, Users, Building2, ArrowRight, Menu, X, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import LanguageSwitcher from '../components/LanguageSwitcher'
+import { useLanguageStore } from '../stores/languageStore'
 
 export default function Landing() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { t } = useLanguageStore()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,12 +27,12 @@ export default function Landing() {
   }, [])
 
   const navItems = [
-    { label: "Trang Chủ", href: "#home" },
-    { label: "Dịch Vụ", href: "#services" },
-    { label: "Tính Năng", href: "#features" },
-    { label: "Đánh Giá", href: "#testimonials" },
-    { label: "Blog", href: "#blog" },
-    { label: "Liên Hệ", href: "#contact" },
+    { label: t.nav.home, href: "#home" },
+    { label: t.nav.services, href: "#services" },
+    { label: t.nav.features, href: "#features" },
+    { label: t.nav.testimonials, href: "#testimonials" },
+    { label: t.nav.blog, href: "#blog" },
+    { label: t.nav.contact, href: "#contact" },
   ]
 
   return (
@@ -100,17 +103,18 @@ export default function Landing() {
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 z-10">
               <div className="hidden md:flex items-center gap-2 sm:gap-3 lg:gap-4">
+                <LanguageSwitcher />
                 <Link
                   to="/login"
                   className={`text-white hover:text-green-200 hover:bg-white/10 transition-all rounded-lg inline-flex items-center justify-center font-semibold ${isScrolled ? 'h-8 sm:h-9 px-3 sm:px-4 text-xs' : 'h-9 sm:h-10 px-4 sm:px-6 text-xs sm:text-sm'}`}
                 >
-                  Đăng Nhập
+                  {t.login}
                 </Link>
                 <Link
                   to="/register"
                   className={`bg-white text-primary-600 hover:bg-green-50 shadow-lg hover:shadow-xl transition-all hover:scale-105 font-bold rounded-lg inline-flex items-center justify-center ${isScrolled ? 'h-8 sm:h-9 px-3 sm:px-4 text-xs' : 'h-9 sm:h-10 px-4 sm:px-6 text-xs sm:text-sm'}`}
                 >
-                  Đăng Ký
+                  {t.register}
                 </Link>
               </div>
 
@@ -150,14 +154,14 @@ export default function Landing() {
                     className="w-full text-white border border-white/20 hover:bg-white/10 rounded-lg sm:rounded-xl h-11 sm:h-12 flex items-center justify-center font-semibold text-sm sm:text-base" 
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Đăng Nhập
+                    {t.login}
                   </Link>
                   <Link 
                     to="/register" 
                     className="w-full bg-white text-primary-600 hover:bg-green-50 font-bold rounded-lg sm:rounded-xl h-11 sm:h-12 flex items-center justify-center shadow-lg text-sm sm:text-base" 
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Đăng Ký
+                    {t.register}
                   </Link>
                 </div>
               </div>
@@ -208,24 +212,24 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-                Quản Lý Điện Năng Thông Minh
+                {t.landing.heroTitle}
               </h1>
               <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-green-100">
-                Kiểm soát lượng điện tiêu thụ của bạn để dùng và tiết kiệm hiệu quả với GreenEnergy AI
+                {t.landing.heroSubtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-4 sm:mb-6">
                 <Link to="/register" className="px-6 sm:px-8 py-3 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg text-sm sm:text-base">
-                  Bắt Đầu Ngay
+                  {t.landing.getStarted}
                 </Link>
                 <Link to="/login" className="px-6 sm:px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors text-sm sm:text-base">
-                  Đăng Nhập
+                  {t.login}
                 </Link>
               </div>
               
               {/* Free Trial Banner with fade animation */}
               <div className="flex justify-center lg:justify-start">
                 <p className="text-white text-xs sm:text-sm font-bold animate-[fadeInOut_3s_ease-in-out_infinite]">
-                  Người Thuê nhận FREE 2 tháng Gói Cơ Bản khi đăng ký lần đầu!
+                  {t.landing.freeTrial}
                 </p>
               </div>
             </div>
@@ -244,9 +248,9 @@ export default function Landing() {
       <div id="services" className="container mx-auto px-4 py-8 sm:py-10 md:py-12 max-w-7xl">
         <div className="text-center mb-10 sm:mb-12 md:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            Quản lý toàn bộ cộng đồng của bạn<br className="hidden sm:block" />trong một hệ thống duy nhất
+            {t.landing.manageTitle}
           </h2>
-          <p className="text-sm sm:text-base text-gray-600">GreenEnergy AI phù hợp với ai?</p>
+          <p className="text-sm sm:text-base text-gray-600">{t.landing.manageSubtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
@@ -254,9 +258,9 @@ export default function Landing() {
             <div className="bg-green-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="text-green-600" size={28} />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold mb-3">Người Thuê Trọ</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-3">{t.landing.tenant}</h3>
             <p className="text-gray-600 text-xs sm:text-sm">
-              Theo dõi tiêu thụ điện cá nhân, nhận cảnh báo khi vượt ngưỡng và được AI tư vấn tiết kiệm điện hiệu quả
+              {t.landing.tenantDesc}
             </p>
           </div>
 
@@ -264,9 +268,9 @@ export default function Landing() {
             <div className="bg-green-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Building2 className="text-green-600" size={28} />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold mb-3">Chủ Nhà Trọ</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-3">{t.landing.landlord}</h3>
             <p className="text-gray-600 text-xs sm:text-sm">
-              Quản lý nhiều phòng trọ, tự động tính toán hóa đơn điện và theo dõi thanh toán của người thuê một cách dễ dàng
+              {t.landing.landlordDesc}
             </p>
           </div>
 
@@ -274,9 +278,9 @@ export default function Landing() {
             <div className="bg-green-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="text-green-600" size={28} />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold mb-3">Doanh Nghiệp<br />& Tổ Chức</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-3">{t.landing.enterprise}</h3>
             <p className="text-gray-600 text-xs sm:text-sm">
-              Giám sát tiêu thụ điện toàn bộ tòa nhà, phân tích chi phí và tối ưu hóa hiệu suất năng lượng
+              {t.landing.enterpriseDesc}
             </p>
           </div>
         </div>
@@ -295,16 +299,16 @@ export default function Landing() {
             </div>
             <div className="order-1 lg:order-2 text-center lg:text-left">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Công nghệ OCR thông minh nhận diện đồng hồ điện tự động
+                {t.landing.ocrTitle}
               </h2>
               <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                Chỉ cần chụp ảnh đồng hồ điện, hệ thống AI của chúng tôi sẽ tự động nhận diện số điện và ghi nhận vào hệ thống. Tiết kiệm thời gian, chính xác tuyệt đối và không cần nhập liệu thủ công.
+                {t.landing.ocrDesc}
               </p>
               <button 
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-5 sm:px-6 py-2.5 sm:py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
               >
-                Tìm Hiểu Thêm
+                {t.landing.learnMore}
               </button>
             </div>
           </div>
@@ -324,16 +328,16 @@ export default function Landing() {
             </div>
             <div className="order-1 lg:order-2 text-center lg:text-left">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
-                AI Chatbot tư vấn tiết kiệm điện 24/7
+                {t.landing.aiTitle}
               </h2>
               <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                Trợ lý AI thông minh của chúng tôi luôn sẵn sàng tư vấn cách tiết kiệm điện, phân tích xu hướng tiêu thụ và đưa ra các gợi ý tối ưu dựa trên thói quen sử dụng của bạn.
+                {t.landing.aiDesc}
               </p>
               <button 
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-5 sm:px-6 py-2.5 sm:py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
               >
-                Tìm Hiểu Thêm
+                {t.landing.learnMore}
               </button>
             </div>
           </div>
@@ -345,10 +349,10 @@ export default function Landing() {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-8 sm:mb-10 md:mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
-              Giúp hàng nghìn người dùng <span className="text-primary-600">tiết kiệm điện mỗi ngày</span>
+              {t.landing.achievementTitle} <span className="text-primary-600">{t.landing.achievementHighlight}</span>
             </h2>
             <p className="text-gray-600 text-sm sm:text-base lg:text-lg px-4">
-              Tham gia cộng đồng GreenEnergy AI để quản lý điện năng thông minh và tiết kiệm chi phí hiệu quả
+              {t.landing.achievementSubtitle}
             </p>
           </div>
           
@@ -357,12 +361,12 @@ export default function Landing() {
               to="/register" 
               className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform text-sm sm:text-base"
             >
-              Bắt Đầu Ngay - Miễn Phí <ArrowRight size={18} className="sm:w-5 sm:h-5" />
+              {t.landing.startFree} <ArrowRight size={18} className="sm:w-5 sm:h-5" />
             </Link>
             
             {/* Free Trial Text */}
             <p className="text-primary-600 text-xs sm:text-sm font-bold animate-[fadeInOut_3s_ease-in-out_infinite]">
-              Người Thuê nhận FREE 2 tháng Gói Cơ Bản khi đăng ký lần đầu!
+              {t.landing.freeTrial}
             </p>
           </div>
         </div>
@@ -381,10 +385,10 @@ export default function Landing() {
             </div>
             <div className="lg:col-span-2 text-center lg:text-left">
               <p className="text-gray-600 mb-4 sm:mb-6 italic text-sm sm:text-base lg:text-lg leading-relaxed">
-                "GreenEnergy AI đã giúp tôi tiết kiệm được 30% chi phí điện hàng tháng. Giao diện dễ sử dụng, tính năng OCR nhận diện đồng hồ rất chính xác và AI chatbot tư vấn rất hữu ích. Tôi rất hài lòng với dịch vụ này!"
+                {t.landing.testimonialText}
               </p>
-              <div className="text-primary-600 font-semibold mb-1 text-base sm:text-lg">Nguyễn Văn An</div>
-              <div className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Chủ nhà trọ tại Hà Nội</div>
+              <div className="text-primary-600 font-semibold mb-1 text-base sm:text-lg">{t.landing.testimonialName}</div>
+              <div className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">{t.landing.testimonialRole}</div>
               
               {/* Rating Stars */}
               <div className="flex gap-1 mb-4 sm:mb-6 justify-center lg:justify-start">
@@ -399,7 +403,7 @@ export default function Landing() {
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-primary-600 text-xs sm:text-sm font-semibold flex items-center gap-2 hover:gap-3 transition-all mx-auto lg:mx-0"
               >
-                Xem thêm đánh giá <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                {t.landing.moreReviews} <ArrowRight size={14} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -410,10 +414,10 @@ export default function Landing() {
       <div id="blog" className="container mx-auto px-4 py-12 sm:py-16 md:py-20 max-w-7xl">
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            Chia sẻ kiến thức tiết kiệm điện
+            {t.landing.blogTitle}
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base px-4">
-            Blog GreenEnergy AI là nơi tốt nhất để đọc về các xu hướng tiết kiệm năng lượng mới nhất, mẹo hay và nhiều hơn nữa. Tham gia cộng đồng của chúng tôi để học hỏi cách tối ưu hóa chi phí điện năng.
+            {t.landing.blogSubtitle}
           </p>
         </div>
 
@@ -428,13 +432,13 @@ export default function Landing() {
             </div>
             <div className="p-4 sm:p-6 text-center">
               <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
-                10 Cách Tiết Kiệm Điện Hiệu Quả Cho Nhà Trọ
+                {t.landing.blog1}
               </h3>
               <button 
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-primary-600 font-semibold flex items-center justify-center gap-2 hover:gap-3 transition-all mx-auto text-xs sm:text-sm"
               >
-                Đọc thêm <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                {t.landing.readMore} <ArrowRight size={14} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -449,13 +453,13 @@ export default function Landing() {
             </div>
             <div className="p-4 sm:p-6 text-center">
               <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
-                Hướng Dẫn Sử Dụng OCR Nhận Diện Đồng Hồ Điện
+                {t.landing.blog2}
               </h3>
               <button 
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-primary-600 font-semibold flex items-center justify-center gap-2 hover:gap-3 transition-all mx-auto text-xs sm:text-sm"
               >
-                Đọc thêm <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                {t.landing.readMore} <ArrowRight size={14} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -470,13 +474,13 @@ export default function Landing() {
             </div>
             <div className="p-4 sm:p-6 text-center">
               <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">
-                Bảo Mật Dữ Liệu Tiêu Thụ Điện Của Bạn
+                {t.landing.blog3}
               </h3>
               <button 
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-primary-600 font-semibold flex items-center justify-center gap-2 hover:gap-3 transition-all mx-auto text-xs sm:text-sm"
               >
-                Đọc thêm <ArrowRight size={14} className="sm:w-4 sm:h-4" />
+                {t.landing.readMore} <ArrowRight size={14} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -487,13 +491,13 @@ export default function Landing() {
       <div className="bg-gradient-to-br from-primary-600 to-primary-800 py-10 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
-            Sẵn sàng bắt đầu tiết kiệm điện?
+            {t.landing.readyTitle}
           </h2>
           <p className="text-green-100 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8">
-            Tham gia cùng hàng nghìn người dùng đang tiết kiệm chi phí điện mỗi ngày
+            {t.landing.readySubtitle}
           </p>
           <Link to="/register" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary-600 rounded-lg font-semibold hover:bg-green-50 transition-colors shadow-xl hover:scale-105 transform text-sm sm:text-base">
-            Đăng Ký Miễn Phí <ArrowRight size={18} className="sm:w-5 sm:h-5" />
+            {t.landing.registerFree} <ArrowRight size={18} className="sm:w-5 sm:h-5" />
           </Link>
         </div>
       </div>
@@ -503,11 +507,11 @@ export default function Landing() {
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="text-center mb-8 sm:mb-10 md:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-              <span className="text-gray-900">Gửi đánh giá & </span>
-              <span className="text-emerald-600">Góp ý</span>
+              <span className="text-gray-900">{t.landing.feedbackTitle.split('&')[0]}& </span>
+              <span className="text-emerald-600">{t.landing.feedbackTitle.split('& ')[1] || 'Góp ý'}</span>
             </h2>
             <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
-              Ý kiến của bạn giúp chúng tôi cải thiện dịch vụ tốt hơn mỗi ngày
+              {t.landing.feedbackSubtitle}
             </p>
           </div>
 
@@ -516,7 +520,7 @@ export default function Landing() {
               {/* Rating */}
               <div>
                 <label className="block text-gray-900 font-medium mb-2 sm:mb-3 text-sm sm:text-base">
-                  Đánh giá của bạn <span className="text-red-500">*</span>
+                  {t.landing.yourRating} <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-1.5 sm:gap-2 justify-center">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -536,11 +540,11 @@ export default function Landing() {
               {/* Name */}
               <div>
                 <label className="block text-gray-900 font-medium mb-2 text-sm sm:text-base">
-                  Họ và tên
+                  {t.landing.fullName}
                 </label>
                 <input
                   type="text"
-                  placeholder="Nhập họ và tên của bạn"
+                  placeholder={t.landing.namePlaceholder}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition text-sm sm:text-base"
                 />
               </div>
@@ -548,11 +552,11 @@ export default function Landing() {
               {/* Email */}
               <div>
                 <label className="block text-gray-900 font-medium mb-2 text-sm sm:text-base">
-                  Email
+                  {t.landing.email}
                 </label>
                 <input
                   type="email"
-                  placeholder="Nhập email của bạn"
+                  placeholder={t.landing.emailInputPlaceholder}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition text-sm sm:text-base"
                 />
               </div>
@@ -560,11 +564,11 @@ export default function Landing() {
               {/* Feedback */}
               <div>
                 <label className="block text-gray-900 font-medium mb-2 text-sm sm:text-base">
-                  Nhận xét của bạn <span className="text-red-500">*</span>
+                  {t.landing.yourComment} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   rows={5}
-                  placeholder="Chia sẻ trải nghiệm của bạn về dịch vụ của GreenEnergy AI..."
+                  placeholder={t.landing.commentPlaceholder}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition resize-none text-sm sm:text-base"
                 ></textarea>
               </div>
@@ -574,7 +578,7 @@ export default function Landing() {
                 type="submit"
                 className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 sm:py-4 rounded-lg transition-all shadow-lg hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transform text-sm sm:text-base"
               >
-                Gửi đánh giá
+                {t.landing.submitReview}
               </button>
             </form>
           </div>
@@ -586,18 +590,18 @@ export default function Landing() {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-8 sm:mb-10 md:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-              <span className="text-white">Liên hệ & </span>
-              <span className="text-emerald-400">Địa chỉ</span>
+              <span className="text-white">{t.landing.contactTitle.split('&')[0]}& </span>
+              <span className="text-emerald-400">{t.landing.contactTitle.split('& ')[1] || 'Địa chỉ'}</span>
             </h2>
             <p className="text-slate-400 text-sm sm:text-base lg:text-lg">
-              Hãy liên hệ với chúng tôi để được tư vấn miễn phí
+              {t.landing.contactSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Contact Info */}
             <div className="bg-slate-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-700">
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-6 sm:mb-8">Thông tin liên hệ</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-6 sm:mb-8">{t.landing.contactInfo}</h3>
               
               <div className="space-y-4 sm:space-y-6">
                 {/* Address */}
@@ -609,7 +613,7 @@ export default function Landing() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">Địa chỉ</h4>
+                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">{t.landing.address}</h4>
                     <p className="text-slate-400 text-xs sm:text-sm">Số 1 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức, TP.HCM</p>
                   </div>
                 </div>
@@ -622,7 +626,7 @@ export default function Landing() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">Hotline</h4>
+                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">{t.landing.hotline}</h4>
                     <a href="tel:0888889805" className="text-emerald-400 hover:text-emerald-300 transition text-sm sm:text-base">088 888 9805</a>
                     <p className="text-slate-500 text-xs sm:text-sm">Zalo: 0888889805</p>
                   </div>
@@ -636,7 +640,7 @@ export default function Landing() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">Email</h4>
+                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">{t.landing.email}</h4>
                     <a href="mailto:greenenergy@gmail.com" className="text-emerald-400 hover:text-emerald-300 transition text-sm sm:text-base break-all">greenenergy@gmail.com</a>
                   </div>
                 </div>
@@ -649,14 +653,14 @@ export default function Landing() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">Website</h4>
+                    <h4 className="text-white font-semibold mb-1 text-sm sm:text-base">{t.landing.website}</h4>
                     <a href="https://greenenergy.vn" className="text-emerald-400 hover:text-emerald-300 transition text-sm sm:text-base break-all">https://greenenergy.vn</a>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-700 text-center">
-                <p className="text-slate-400 text-xs sm:text-sm">Hỗ trợ 24/7 - Tư vấn miễn phí</p>
+                <p className="text-slate-400 text-xs sm:text-sm">{t.landing.support247}</p>
               </div>
             </div>
 
@@ -688,7 +692,7 @@ export default function Landing() {
                 <img src="/logo.png" alt="GreenEnergy AI" className="h-16 sm:h-20 md:h-24 -ml-0 sm:-ml-6 md:-ml-8 -mt-0 sm:-mt-4 md:-mt-8" />
               </div>
               <p className="text-xs sm:text-sm mb-3 -ml-0 sm:-ml-6 md:-ml-8 text-gray-400">
-                Giải pháp quản lý điện năng thông minh cho mọi người
+                {t.landing.footerDesc}
               </p>
               <p className="text-xs -ml-0 sm:-ml-6 md:-ml-8 text-gray-500">
                 © 2024 GreenEnergy AI
@@ -697,36 +701,36 @@ export default function Landing() {
 
             {/* Company Links */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">Company</h3>
+              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">{t.landing.company}</h3>
               <ul className="space-y-2 text-xs sm:text-sm">
-                <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
-                <li><Link to="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
-                <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
+                <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">{t.landing.aboutUs}</Link></li>
+                <li><Link to="/blog" className="text-gray-400 hover:text-white transition-colors">{t.nav.blog}</Link></li>
+                <li><Link to="/careers" className="text-gray-400 hover:text-white transition-colors">{t.landing.careers}</Link></li>
+                <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">{t.nav.contact}</Link></li>
               </ul>
             </div>
 
             {/* Support Links */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">Support</h3>
+              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">{t.landing.supportSection}</h3>
               <ul className="space-y-2 text-xs sm:text-sm">
-                <li><Link to="/help" className="text-gray-400 hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="/faq" className="text-gray-400 hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link to="/terms" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/help" className="text-gray-400 hover:text-white transition-colors">{t.landing.helpCenter}</Link></li>
+                <li><Link to="/faq" className="text-gray-400 hover:text-white transition-colors">{t.landing.faq}</Link></li>
+                <li><Link to="/terms" className="text-gray-400 hover:text-white transition-colors">{t.landing.terms}</Link></li>
+                <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">{t.landing.privacy}</Link></li>
               </ul>
             </div>
 
             {/* Newsletter */}
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">Stay Up to Date</h3>
+              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm">{t.landing.stayUpToDate}</h3>
               <p className="text-xs sm:text-sm text-gray-400 mb-3">
-                Đăng ký nhận tin tức và cập nhật mới nhất
+                {t.landing.newsletterDesc}
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="email"
-                  placeholder="Email của bạn"
+                  placeholder={t.landing.emailPlaceholder}
                   className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs sm:text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition"
                 />
                 <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center sm:w-auto">
@@ -739,10 +743,10 @@ export default function Landing() {
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-500 text-center sm:text-left">
-              &copy; 2024 GreenEnergy AI. All rights reserved.
+              {t.landing.allRightsReserved}
             </p>
             <p className="text-xs text-gray-500 text-center sm:text-right">
-              Được phát triển với <span className="text-red-500">❤️</span> tại Việt Nam
+              {t.landing.madeInVietnam}
             </p>
           </div>
         </div>

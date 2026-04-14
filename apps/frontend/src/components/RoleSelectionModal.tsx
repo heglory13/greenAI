@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Users, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../lib/config';
 
 interface RoleSelectionModalProps {
   token: string;
@@ -19,7 +20,7 @@ export default function RoleSelectionModal({ token, onComplete }: RoleSelectionM
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/auth/role', {
+      const response = await fetch(`${API_BASE}/api/auth/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ export default function RoleSelectionModal({ token, onComplete }: RoleSelectionM
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Chào mừng bạn đến với GreenEnergyAI! 🎉
+            Chào mừng bạn đến với GreenEnergyAI!
           </h2>
           <p className="text-gray-600">
             Vui lòng chọn vai trò của bạn để tiếp tục
@@ -80,9 +81,9 @@ export default function RoleSelectionModal({ token, onComplete }: RoleSelectionM
                   Theo dõi tiêu thụ điện, nhận thông báo hóa đơn và quản lý chi phí
                 </p>
                 <ul className="text-xs text-gray-500 space-y-1">
-                  <li>✓ Theo dõi tiêu thụ điện</li>
-                  <li>✓ Nhận thông báo hóa đơn</li>
-                  <li>✓ AI tư vấn tiết kiệm</li>
+                  <li>Theo dõi tiêu thụ điện</li>
+                  <li>Nhận thông báo hóa đơn</li>
+                  <li>AI tư vấn tiết kiệm</li>
                 </ul>
               </div>
             </div>
@@ -122,9 +123,9 @@ export default function RoleSelectionModal({ token, onComplete }: RoleSelectionM
                   Quản lý phòng trọ, theo dõi người thuê và tạo hóa đơn tự động
                 </p>
                 <ul className="text-xs text-gray-500 space-y-1">
-                  <li>✓ Quản lý nhiều phòng trọ</li>
-                  <li>✓ Tạo hóa đơn tự động</li>
-                  <li>✓ Theo dõi thanh toán</li>
+                  <li>Quản lý nhiều phòng trọ</li>
+                  <li>Tạo hóa đơn tự động</li>
+                  <li>Theo dõi thanh toán</li>
                 </ul>
               </div>
             </div>

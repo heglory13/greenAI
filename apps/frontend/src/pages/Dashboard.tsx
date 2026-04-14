@@ -9,6 +9,8 @@ import { useAuthStore } from '@/stores/authStore'
 import api from '@/lib/api'
 import AIInsights from '@/components/AIInsights'
 import SubscriptionWarning from '@/components/SubscriptionWarning'
+import AnomalyPopup from '@/components/AnomalyPopup'
+import MeterFeedbackBanner from '@/components/MeterFeedbackBanner'
 
 export default function Dashboard() {
   const { dashboardStats, tips, isLoading } = useAnalytics()
@@ -97,13 +99,13 @@ export default function Dashboard() {
 
   // Get tree stage for check-in
   const getTreeStage = (streak: number) => {
-    if (streak === 0) return { emoji: '🌱', name: 'Hạt giống', color: 'text-gray-400' }
-    if (streak < 5) return { emoji: '🌱', name: 'Mầm non', color: 'text-green-400' }
-    if (streak < 10) return { emoji: '🌿', name: 'Cây con', color: 'text-green-500' }
-    if (streak < 15) return { emoji: '🌳', name: 'Cây nhỏ', color: 'text-green-600' }
-    if (streak < 20) return { emoji: '🌲', name: 'Cây lớn', color: 'text-green-700' }
-    if (streak < 25) return { emoji: '🌴', name: 'Cây to', color: 'text-green-800' }
-    return { emoji: '🎄', name: 'Cây khổng lồ', color: 'text-green-900' }
+    if (streak === 0) return { emoji: '', name: 'Hạt giống', color: 'text-gray-400' }
+    if (streak < 5) return { emoji: '', name: 'Mầm non', color: 'text-green-400' }
+    if (streak < 10) return { emoji: '', name: 'Cây con', color: 'text-green-500' }
+    if (streak < 15) return { emoji: '', name: 'Cây nhỏ', color: 'text-green-600' }
+    if (streak < 20) return { emoji: '', name: 'Cây lớn', color: 'text-green-700' }
+    if (streak < 25) return { emoji: '', name: 'Cây to', color: 'text-green-800' }
+    return { emoji: '', name: 'Cây khổng lồ', color: 'text-green-900' }
   }
 
   const streak = checkInData?.streak || 0
@@ -112,8 +114,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Anomaly Popup on login */}
+      <AnomalyPopup />
+
       {/* Subscription Warning Banner */}
       <SubscriptionWarning />
+
+      {/* Meter Feedback for tenants */}
+      <MeterFeedbackBanner />
 
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-green-50 via-blue-50 to-green-50 rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 border border-green-200">
@@ -317,7 +325,7 @@ export default function Dashboard() {
                 </div>
               ) : streak >= 25 ? (
                 <div className="text-xs text-green-600 font-semibold">
-                  🎉 Đạt mốc 25 ngày!
+                  Đạt mốc 25 ngày!
                 </div>
               ) : (
                 <div className="text-xs text-gray-500">
@@ -384,7 +392,7 @@ export default function Dashboard() {
       {hasAnalytics && (
         <div>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
-            🤖 Phân Tích AI {selectedRoom ? `- ${selectedRoom.name}` : ''}
+            Phân Tích AI {selectedRoom ? `- ${selectedRoom.name}` : ''}
           </h2>
           <AIInsights />
         </div>

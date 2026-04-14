@@ -3,18 +3,19 @@ import User from '../models/User.model.js'
 import Room from '../models/Room.model.js'
 
 // Define plan limits
+// DEMO MODE: Free plans have all features enabled
 export const PLAN_LIMITS = {
   // Tenant plans
   'Gói Miễn Phí': {
     type: 'tenant',
     maxRooms: 1,
-    historyMonths: 3,
-    ocrEnabled: false,
-    pdfExport: false,
-    analytics: false,
-    aiEnabled: false,
-    aiInsights: false,
-    support: false,
+    historyMonths: null, // unlimited for demo
+    ocrEnabled: true,
+    pdfExport: true,
+    analytics: true,
+    aiEnabled: true,
+    aiInsights: true,
+    support: true,
     price: 0
   },
   'Gói Cơ Bản': {
@@ -32,14 +33,14 @@ export const PLAN_LIMITS = {
   // Landlord plans
   'Gói Miễn Phí (Chủ Trọ)': {
     type: 'landlord',
-    maxRooms: 2,
-    historyMonths: 3,
-    ocrEnabled: false,
-    pdfExport: false,
-    analytics: false,
-    aiEnabled: false,
-    aiInsights: false,
-    support: false,
+    maxRooms: 999, // unlimited for demo
+    historyMonths: null,
+    ocrEnabled: true,
+    pdfExport: true,
+    analytics: true,
+    aiEnabled: true,
+    aiInsights: true,
+    support: true,
     price: 0
   },
   'Gói Starter': {

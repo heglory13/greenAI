@@ -17,6 +17,18 @@ export default function MeterReading() {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const { uploadImage, addManualReading, readings, isLoading, isUploading, isAdding } = useMeterReading()
+  const [isTenantWithRoom, setIsTenantWithRoom] = useState(false)
+
+  useEffect(() => {
+    // Check if tenant is assigned to a room — they can't enter readings
+    if (user?.role === 'tenant') {
+      api.get('/rooms').then(res => {
+        if (res.data.rooms?.length > 0) {
+          setIsTenantWithRoom(true)
+        }
+      }).catch(() => {})
+    }
+  }, [user])
 
   useEffect(() => {
     // Show room info if roomId is present
@@ -128,9 +140,9 @@ export default function MeterReading() {
       // Convert to blob with good quality
       canvas.toBlob((blob) => {
         if (blob) {
-          console.log('📸 Captured cropped image size:', blob.size, 'bytes')
-          console.log('📐 Cropped dimensions:', canvas.width, 'x', canvas.height)
-          console.log('✂️ Crop area: x=' + cropX + ', y=' + cropY + ', w=' + cropWidth + ', h=' + cropHeight)
+          console.log('Captured cropped image size:', blob.size, 'bytes')
+          console.log('Cropped dimensions:', canvas.width, 'x', canvas.height)
+          console.log('Crop area: x=' + cropX + ', y=' + cropY + ', w=' + cropWidth + ', h=' + cropHeight)
           
           const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' })
           setImage(file)
@@ -196,6 +208,40 @@ export default function MeterReading() {
   }
 
   const isProcessing = isUploading || isAdding
+
+  // Tenant assigned to a room can only view, not enter readings
+  if (isTenantWithRoom) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Chỉ Số Điện</h1>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+          <p className="text-blue-800 font-medium mb-2">Chỉ số điện do chủ trọ nhập</p>
+          <p className="text-sm text-blue-600">Bạn có thể xem chỉ số điện và hóa đơn tại trang chủ. Khi chủ trọ nhập chỉ số mới, bạn sẽ nhận được thông báo xác nhận.</p>
+        </div>
+
+        {/* Show reading history (read-only) */}
+        {readings.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h2 className="text-base font-semibold mb-3">Lịch sử chỉ số</h2>
+            <div className="space-y-2">
+              {readings.slice(0, 10).map((r: any) => (
+                <div key={r._id} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 text-sm">
+                  <div>
+                    <span className="font-medium">{r.value} kWh</span>
+                    {r.consumption > 0 && <span className="text-gray-500 ml-2">(+{r.consumption} kWh)</span>}
+                  </div>
+                  <div className="text-right">
+                    <span className="text-gray-500">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
+                    {r.cost > 0 && <span className="text-red-600 ml-2">{r.cost.toLocaleString('vi-VN')}d</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">

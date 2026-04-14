@@ -270,7 +270,7 @@ export default function Settings() {
       </div>
 
       <div className="bg-blue-50 border-2 border-blue-200 rounded-lg sm:rounded-xl p-4 sm:p-6">
-        <h3 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm lg:text-base">💡 Cách hoạt động</h3>
+        <h3 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm lg:text-base">Cách hoạt động</h3>
         <ul className="text-xs sm:text-sm text-gray-700 space-y-1.5 sm:space-y-2">
           <li>• Lần chụp đầu tiên vào ngày thanh toán sẽ là mốc bắt đầu (số 0)</li>
           <li>• Tháng sau cùng ngày, chụp lại để tính tiêu thụ của chu kỳ</li>

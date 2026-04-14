@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Search, Eye, ChevronDown, ChevronRight, X, Home, User, Zap, Calendar } from 'lucide-react'
+import { Search, Eye, ChevronDown, ChevronRight, X, Home, User, Zap, Calendar, Download } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import api from '@/lib/api'
 import toast from 'react-hot-toast'
+import { exportToCSV } from '@/utils/exportExcel'
 
 interface RoomDetail {
   _id: string
@@ -124,7 +125,41 @@ export default function AdminRooms() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <h2 className="text-2xl sm:text-3xl font-bold">Quản Lý Phòng</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl sm:text-3xl font-bold">Quản Lý Phòng</h2>
+        <button
+          onClick={() => {
+            // Flatten rooms for export
+            const flatRooms: any[] = []
+            rooms.forEach((group: any) => {
+              (group.rooms || [group]).forEach((room: any) => {
+                flatRooms.push({
+                  landlordName: group.landlordName || room.landlordId?.name || '',
+                  landlordEmail: group.landlordEmail || room.landlordId?.email || '',
+                  roomName: room.name,
+                  address: room.address || '',
+                  electricityRate: room.electricityRate,
+                  tenantName: room.tenantId?.name || '',
+                  status: room.status,
+                })
+              })
+            })
+            exportToCSV(flatRooms, 'phong-tro', [
+              { key: 'landlordName', label: 'Chủ trọ' },
+              { key: 'landlordEmail', label: 'Email chủ trọ' },
+              { key: 'roomName', label: 'Tên phòng' },
+              { key: 'address', label: 'Địa chỉ' },
+              { key: 'electricityRate', label: 'Giá điện (VNĐ/kWh)' },
+              { key: 'tenantName', label: 'Người thuê' },
+              { key: 'status', label: 'Trạng thái' },
+            ])
+          }}
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs sm:text-sm font-medium"
+        >
+          <Download size={16} />
+          Xuất Excel
+        </button>
+      </div>
 
       <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200">
         <div className="relative">

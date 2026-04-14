@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, User, Home, Zap, Calendar, Camera, Edit2, Trash2 } from 'lucide-react'
 import api from '@/lib/api'
+import { API_BASE } from '@/lib/config'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -240,7 +241,7 @@ export default function RoomDetails() {
                     <td className="py-3 px-4 text-center">
                       {reading.imagePath ? (
                         <button
-                          onClick={() => window.open(`http://localhost:3000/${reading.imagePath}`, '_blank')}
+                          onClick={() => window.open(`${API_BASE}/${reading.imagePath}`, '_blank')}
                           className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                         >
                           Xem ảnh

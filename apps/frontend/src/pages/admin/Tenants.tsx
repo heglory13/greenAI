@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Search, User, X, Calendar, Zap, DollarSign } from 'lucide-react'
+import { Search, User, X, Calendar, Zap, DollarSign, Download } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import api from '@/lib/api'
 import toast from 'react-hot-toast'
+import { exportToCSV } from '@/utils/exportExcel'
 
 interface Reading {
   _id: string
@@ -123,8 +124,20 @@ export default function AdminTenants() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl sm:text-3xl font-bold">Cá Nhân</h2>
+        <button
+          onClick={() => exportToCSV(unassignedTenants, 'ca-nhan', [
+            { key: 'name', label: 'Tên' },
+            { key: 'email', label: 'Email' },
+            { key: 'subscriptionPlan', label: 'Gói dịch vụ' },
+            { key: 'createdAt', label: 'Ngày tạo' },
+          ])}
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs sm:text-sm font-medium"
+        >
+          <Download size={16} />
+          Xuất Excel
+        </button>
       </div>
 
       <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200">

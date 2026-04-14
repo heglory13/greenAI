@@ -19,6 +19,7 @@ import Support from './pages/Support'
 import CheckIn from './pages/CheckIn'
 import PaymentSuccess from './pages/PaymentSuccess'
 import PaymentFailure from './pages/PaymentFailure'
+// Payment pages imported but routes hidden for demo
 import AdminLayout from './components/admin/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminUsers from './pages/admin/Users'
@@ -38,6 +39,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore()
   if (!isAuthenticated) return <Navigate to="/login" />
   if (user?.role !== 'admin') return <Navigate to="/trang-chu" />
+  return <>{children}</>
+}
+
+function LandlordRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuthStore()
+  if (user?.role !== 'landlord') return <Navigate to="/trang-chu" />
   return <>{children}</>
 }
 
@@ -74,11 +81,13 @@ function App() {
           <Route path="cai-dat" element={<Settings />} />
           <Route path="thanh-tich" element={<Achievements />} />
           <Route path="diem-danh" element={<CheckIn />} />
-          <Route path="quan-ly-phong" element={<RoomManagement />} />
+          <Route path="quan-ly-phong" element={<LandlordRoute><RoomManagement /></LandlordRoute>} />
           <Route path="phong/:id" element={<RoomDetails />} />
           <Route path="ho-tro" element={<Support />} />
+          {/* Payment routes hidden for demo
           <Route path="thanh-toan/thanh-cong" element={<PaymentSuccess />} />
           <Route path="thanh-toan/that-bai" element={<PaymentFailure />} />
+          */}
         </Route>
 
         {/* Admin Routes */}

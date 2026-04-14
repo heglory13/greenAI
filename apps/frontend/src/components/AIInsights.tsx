@@ -83,7 +83,7 @@ export default function AIInsights() {
           </div>
           
           <h3 className="text-xl font-bold text-gray-900 mb-2">
-            🤖 AI Phân Tích & Phát Hiện Bất Thường
+            AI Phân Tích & Phát Hiện Bất Thường
           </h3>
           
           <p className="text-gray-700 mb-4 max-w-md mx-auto text-sm">
@@ -111,7 +111,7 @@ export default function AIInsights() {
               <Lightbulb className="text-blue-600" size={20} />
             </div>
             <p className="text-sm text-blue-800">
-              💡 Bạn đang sử dụng tính năng AI thông qua gói của chủ trọ
+              Bạn đang sử dụng tính năng AI thông qua gói của chủ trọ
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function AIInsights() {
               <AlertTriangle className="text-red-600" size={24} />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-red-900 mb-2">⚠️ Phát Hiện Bất Thường</h3>
+              <h3 className="font-semibold text-red-900 mb-2">Phát Hiện Bất Thường</h3>
               <div className="space-y-2">
                 {anomalies.anomalies.map((anomaly: any, index: number) => (
                   <div key={index} className="bg-white rounded-lg p-3 border border-red-200">
@@ -141,6 +141,24 @@ export default function AIInsights() {
               <p className="text-xs text-red-700 mt-2">
                 Trung bình: {anomalies.avgConsumption} kWh
               </p>
+
+              {/* Possible causes & suggestions */}
+              <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm font-semibold text-amber-900 mb-2">Nguyên nhân có thể:</p>
+                <ul className="text-xs text-amber-800 space-y-1 mb-3">
+                  <li>• Thiết bị điện hoạt động liên tục (điều hòa, bình nóng lạnh)</li>
+                  <li>• Thiết bị bị hỏng hoặc rò rỉ điện</li>
+                  <li>• Thay đổi thói quen sử dụng điện</li>
+                  <li>• Thời tiết nóng/lạnh bất thường</li>
+                </ul>
+                <p className="text-sm font-semibold text-green-900 mb-2">Đề xuất giải pháp:</p>
+                <ul className="text-xs text-green-800 space-y-1">
+                  <li>• Kiểm tra các thiết bị điện có hoạt động bình thường không</li>
+                  <li>• Tắt thiết bị không sử dụng, đặc biệt vào ban đêm</li>
+                  <li>• Sử dụng AI Chatbot để được tư vấn chi tiết hơn</li>
+                  <li>• So sánh chỉ số điện với tháng trước để xác nhận</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

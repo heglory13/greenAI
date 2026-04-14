@@ -19,7 +19,7 @@ const Room = mongoose.model('Room', new mongoose.Schema({}, { strict: false }));
 
 async function seedMeterReadings() {
   try {
-    await mongoose.connect('mongodb+srv://quocbao:Hieunguyen1002@cluster0.segxwna.mongodb.net/greenenergy');
+    await mongoose.connect('mongodb+srv://nguyenphuonghaiduong4_db_user:Oh6CTc50gWdCuZBW@cluster0.x99oni5.mongodb.net/greenenergy?appName=Cluster0');
     console.log('Connected to MongoDB');
 
     const room101 = await Room.findOne({ name: 'Phòng 101' });

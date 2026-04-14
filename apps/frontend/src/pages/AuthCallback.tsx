@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { API_BASE } from '../lib/config';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RoleSelectionModal from '../components/RoleSelectionModal';
 import api from '@/lib/api';
@@ -27,7 +28,7 @@ export default function AuthCallback() {
       if (token) {
         try {
           // Fetch user profile with the token
-          const response = await fetch('http://localhost:3000/api/auth/profile', {
+          const response = await fetch(`${API_BASE}/api/auth/profile`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -73,7 +74,7 @@ export default function AuthCallback() {
     if (tempToken && tempUser) {
       try {
         // Fetch updated user data
-        const response = await fetch('http://localhost:3000/api/auth/profile', {
+        const response = await fetch(`${API_BASE}/api/auth/profile`, {
           headers: {
             'Authorization': `Bearer ${tempToken}`
           }
@@ -87,7 +88,7 @@ export default function AuthCallback() {
           
           // Show success message with free trial info for tenants
           if (role === 'tenant') {
-            toast.success('🎉 Chào mừng bạn! Bạn được tặng FREE 2 tháng Gói Cơ Bản!', {
+            toast.success('Chào mừng bạn! Bạn được tặng FREE 2 tháng Gói Cơ Bản!', {
               duration: 5000,
             });
           } else {
@@ -124,3 +125,4 @@ export default function AuthCallback() {
     </div>
   );
 }
+

@@ -30,6 +30,13 @@ export default function AIChatbot() {
     scrollToBottom()
   }, [messages])
 
+  // Listen for open event from AnomalyPopup
+  useEffect(() => {
+    const handler = () => setIsOpen(true)
+    window.addEventListener('open-ai-chatbot', handler)
+    return () => window.removeEventListener('open-ai-chatbot', handler)
+  }, [])
+
   const handleSend = async () => {
     if (!input.trim() || loading) return
 
@@ -68,7 +75,7 @@ export default function AIChatbot() {
           !messages.some(m => m.content.includes('thông qua gói của chủ trọ'))) {
         const infoMessage: Message = {
           role: 'assistant',
-          content: '💡 Bạn đang sử dụng AI thông qua gói của chủ trọ',
+          content: 'Bạn đang sử dụng AI thông qua gói của chủ trọ',
           timestamp: new Date()
         }
         setMessages(prev => [...prev, infoMessage])

@@ -117,19 +117,19 @@ export default function EnergyConsumption() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 max-w-lg mx-auto">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Biểu đồ chi tiết theo ngày/tháng</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Phân tích xu hướng tiêu thụ</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Quản lý tối đa 20 phòng</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>OCR + AI không giới hạn</span>
                 </div>
               </div>

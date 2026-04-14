@@ -28,13 +28,27 @@ export const getCheckInStatus = async (req: AuthRequest, res: Response) => {
       expiresAt: { $gt: new Date() }
     }).sort({ createdAt: -1 })
 
+    // CO2 calculation: each check-in = 0.1 kWh saved
+    const ELECTRICITY_SAVED_PER_CHECKIN = 0.1 // kWh
+    const EMISSION_FACTOR = 0.67 // kg CO2/kWh (Vietnam grid)
+    const CO2_PER_TREE_PER_YEAR = 21 // kg CO2/tree/year
+
+    const totalElectricitySaved = checkIn.totalCheckIns * ELECTRICITY_SAVED_PER_CHECKIN
+    const totalCO2Reduced = totalElectricitySaved * EMISSION_FACTOR
+    const treeEquivalent = totalCO2Reduced / CO2_PER_TREE_PER_YEAR
+
     res.json({
       streak: checkIn.streak,
       totalCheckIns: checkIn.totalCheckIns,
       lastCheckIn: checkIn.lastCheckIn,
       canCheckIn: canCheckInToday(checkIn.lastCheckIn),
       checkInHistory: checkIn.checkInHistory || [],
-      vouchers
+      vouchers,
+      co2Stats: {
+        electricitySaved: Math.round(totalElectricitySaved * 100) / 100,
+        co2Reduced: Math.round(totalCO2Reduced * 1000) / 1000,
+        treeEquivalent: Math.round(treeEquivalent * 1000) / 1000
+      }
     })
   } catch (error) {
     console.error('Get check-in status error:', error)
@@ -189,6 +203,17 @@ export const checkIn = async (req: AuthRequest, res: Response) => {
       await checkIn.save()
     }
 
+    // CO2 calculation for this check-in
+    const ELECTRICITY_SAVED_PER_CHECKIN = 0.1
+    const EMISSION_FACTOR = 0.67
+    const CO2_PER_TREE_PER_YEAR = 21
+
+    const electricitySaved = ELECTRICITY_SAVED_PER_CHECKIN
+    const co2Reduced = electricitySaved * EMISSION_FACTOR
+    const totalElectricitySaved = checkIn.totalCheckIns * ELECTRICITY_SAVED_PER_CHECKIN
+    const totalCO2Reduced = totalElectricitySaved * EMISSION_FACTOR
+    const treeEquivalent = totalCO2Reduced / CO2_PER_TREE_PER_YEAR
+
     res.json({
       message: resetStreak ? '🎉 Hoàn thành thử thách! Cây đã được reset để bắt đầu chu kỳ mới!' : 'Điểm danh thành công!',
       streak: checkIn.streak,
@@ -201,7 +226,13 @@ export const checkIn = async (req: AuthRequest, res: Response) => {
         expiresAt: newVoucher.expiresAt
       } : null,
       resetStreak,
-      voucherMessage: voucherCreated && newVoucher ? `🎉 Chúc mừng! Bạn nhận được voucher giảm ${newVoucher.value}!` : undefined
+      voucherMessage: voucherCreated && newVoucher ? `🎉 Chúc mừng! Bạn nhận được voucher giảm ${newVoucher.value}!` : undefined,
+      co2Message: `Hôm nay bạn đã tiết kiệm ${electricitySaved} kWh điện, góp phần giảm ${Math.round(co2Reduced * 1000) / 1000} kg CO₂ cho môi trường 🌱`,
+      co2Stats: {
+        electricitySaved: Math.round(totalElectricitySaved * 100) / 100,
+        co2Reduced: Math.round(totalCO2Reduced * 1000) / 1000,
+        treeEquivalent: Math.round(treeEquivalent * 1000) / 1000
+      }
     })
   } catch (error) {
     console.error('Check-in error:', error)

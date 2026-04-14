@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { API_BASE } from '../lib/config'
 
 interface User {
   id: string
@@ -46,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
           const token = get().token
           if (!token) return
           
-          const response = await fetch('http://localhost:3000/api/auth/profile', {
+          const response = await fetch(`${API_BASE}/api/auth/profile`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

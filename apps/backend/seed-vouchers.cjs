@@ -17,7 +17,7 @@ const VoucherTemplate = mongoose.model('VoucherTemplate', voucherTemplateSchema)
 
 async function seedVouchers() {
   try {
-    await mongoose.connect('mongodb+srv://quocbao:Hieunguyen1002@cluster0.segxwna.mongodb.net/greenenergy');
+    await mongoose.connect('mongodb+srv://nguyenphuonghaiduong4_db_user:Oh6CTc50gWdCuZBW@cluster0.x99oni5.mongodb.net/greenenergy?appName=Cluster0');
     console.log('✅ Connected to MongoDB');
 
     // Clear existing templates

@@ -38,3 +38,9 @@ Thumbs.db
 uploads/
 temp/
 .vercel
+
+# Seed files with credentials
+apps/backend/*.cjs
+apps/backend/create-admin.cjs
+apps/backend/seed-*.cjs
+apps/backend/seed-*.js

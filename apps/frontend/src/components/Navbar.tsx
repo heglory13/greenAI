@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
-import { Bell, User, LogOut, Menu, X } from 'lucide-react'
+import { User, LogOut, Menu, X } from 'lucide-react'
 import RoomSelector from './RoomSelector'
+import LanguageSwitcher from './LanguageSwitcher'
 import { useState } from 'react'
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -26,6 +28,7 @@ export default function Navbar() {
             </Link>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <LanguageSwitcher />
               <Link to="/login" className="hover:bg-primary-700 px-3 sm:px-4 py-2 rounded-md text-sm sm:text-base">
                 Đăng Nhập
               </Link>
@@ -92,38 +95,59 @@ export default function Navbar() {
                   <Link to="/hoa-don" className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap">
                     Hóa Đơn
                   </Link>
-                  {user?.role !== 'landlord' && (
-                    <Link to="/meo-tiet-kiem" className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap">
-                      Mẹo Tiết Kiệm
-                    </Link>
-                  )}
-                  <Link to="/bang-gia" className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap">
-                    Bảng Giá
-                  </Link>
-                  <Link to="/cai-dat" className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap">
-                    Cài Đặt
-                  </Link>
-                  {user?.role === 'landlord' && (
-                    <Link to="/ho-tro" className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap">
-                      Hỗ Trợ
-                    </Link>
-                  )}
+
+                  {/* "More" dropdown for secondary items */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowMoreMenu(!showMoreMenu)}
+                      className="hover:bg-primary-700 px-2 py-2 rounded-md text-sm whitespace-nowrap flex items-center gap-1"
+                    >
+                      Thêm
+                      <svg className={`w-3 h-3 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showMoreMenu && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowMoreMenu(false)} />
+                        <div className="absolute left-0 mt-1 w-44 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+                          {user?.role !== 'landlord' && (
+                            <Link to="/meo-tiet-kiem" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setShowMoreMenu(false)}>
+                              Mẹo Tiết Kiệm
+                            </Link>
+                          )}
+                          <Link to="/bang-gia" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setShowMoreMenu(false)}>
+                            Bảng Giá
+                          </Link>
+                          <Link to="/diem-danh" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setShowMoreMenu(false)}>
+                            Điểm Danh
+                          </Link>
+                          <Link to="/cai-dat" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setShowMoreMenu(false)}>
+                            Cài Đặt
+                          </Link>
+                          {user?.role === 'landlord' && (
+                            <Link to="/ho-tro" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setShowMoreMenu(false)}>
+                              Hỗ Trợ
+                            </Link>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </>
               )}
             </div>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {user?.role !== 'admin' && <div className="hidden sm:block"><RoomSelector /></div>}
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            {user?.role !== 'admin' && <div className="hidden lg:block"><RoomSelector /></div>}
             
-            <button className="hover:bg-primary-700 p-2 rounded-full hidden sm:block">
-              <Bell size={18} />
-            </button>
+            <LanguageSwitcher />
             
-            <div className="hidden md:flex items-center space-x-2 px-3 py-1 bg-primary-700 rounded-lg">
-              <User size={18} />
-              <span className="text-sm font-medium">{user?.name}</span>
+            <div className="hidden xl:flex items-center space-x-2 px-2 py-1 bg-primary-700 rounded-lg">
+              <User size={16} />
+              <span className="text-xs font-medium truncate max-w-[100px]">{user?.name}</span>
             </div>
             
             <button 
@@ -208,6 +232,9 @@ export default function Navbar() {
                 )}
                 <Link to="/bang-gia" className="block hover:bg-primary-700 px-4 py-2 rounded-md text-sm" onClick={() => setIsMobileMenuOpen(false)}>
                   Bảng Giá
+                </Link>
+                <Link to="/diem-danh" className="block hover:bg-primary-700 px-4 py-2 rounded-md text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                  Điểm Danh
                 </Link>
                 <Link to="/cai-dat" className="block hover:bg-primary-700 px-4 py-2 rounded-md text-sm" onClick={() => setIsMobileMenuOpen(false)}>
                   Cài Đặt

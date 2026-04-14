@@ -7,6 +7,7 @@ import OCRTraining from '../models/OCRTraining.model.js'
 import { CalculationService } from '../services/calculation.service.js'
 import { OCRService } from '../services/ocr.service.js'
 import { SubscriptionService } from '../services/subscription.service.js'
+import MeterFeedback from '../models/MeterFeedback.model.js'
 
 export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
   try {
@@ -22,6 +23,28 @@ export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
 
     const { roomId } = req.body
 
+    // If tenant is assigned to a room, block them from entering readings
+    const currentUser = await User.findById(req.user?.id)
+    if (currentUser?.role === 'tenant') {
+      const tenantRoom = await Room.findOne({ tenantId: req.user?.id })
+      if (tenantRoom) {
+        return res.status(403).json({ error: 'Chỉ chủ trọ mới được nhập chỉ số điện. Bạn có thể xem chỉ số tại trang chủ.' })
+      }
+    }
+
+    // Validate room access if roomId provided
+    if (roomId) {
+      const room = await Room.findById(roomId)
+      if (!room) {
+        return res.status(404).json({ error: 'Phòng không tồn tại' })
+      }
+      // Only landlord of the room can upload meter readings
+      const isLandlord = room.landlordId.toString() === req.user?.id
+      if (!isLandlord) {
+        return res.status(403).json({ error: 'Chỉ chủ trọ mới được nhập chỉ số điện cho phòng' })
+      }
+    }
+
     // Use OCR to extract meter reading from image
     console.log('Processing image:', req.file.path)
     const { value: mockReading, confidence, rawText } = await OCRService.extractMeterReading(req.file.path)
@@ -31,12 +54,12 @@ export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ 
         error: 'Không thể đọc được số từ ảnh. Vui lòng thử lại với ảnh rõ hơn hoặc nhập thủ công.',
         tips: [
-          '✅ Đảm bảo ánh sáng đủ sáng',
-          '✅ Chụp thẳng góc với đồng hồ',
-          '✅ Số phải rõ ràng và trong tiêu cự',
-          '✅ Lau sạch mặt kính đồng hồ',
-          '✅ Ảnh không quá nhỏ (tối thiểu 300x300px)',
-          '✅ Zoom vào số trước khi chụp'
+          'Dam bao anh sang du sang',
+          'Chup thang goc voi dong ho',
+          'So phai ro rang va trong tieu cu',
+          'Lau sach mat kinh dong ho',
+          'Anh khong qua nho (toi thieu 300x300px)',
+          'Zoom vao so truoc khi chup'
         ]
       })
     }
@@ -53,9 +76,9 @@ export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
         electricityRate = room.electricityRate
       }
       
-      // Find latest reading for this room (regardless of who entered it)
+      // Find latest reading for this room by _id (most reliable ordering)
       previousReading = await MeterReading.findOne({ roomId })
-        .sort({ createdAt: -1 })
+        .sort({ _id: -1 })
     } else {
       // Get user's electricity rate
       const user = await User.findById(req.user?.id)
@@ -65,7 +88,7 @@ export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
       
       // Fallback: find by userId
       previousReading = await MeterReading.findOne({ userId: req.user?.id })
-        .sort({ createdAt: -1 })
+        .sort({ _id: -1 })
     }
 
     let consumption = 0
@@ -99,6 +122,22 @@ export const uploadMeterImage = async (req: AuthRequest, res: Response) => {
       id: reading._id,
       rawText // Send raw text to frontend for debugging
     })
+
+    // Auto-create feedback if landlord uploads for a room with tenant
+    if (roomId) {
+      try {
+        const room = await Room.findById(roomId)
+        if (room && room.tenantId && room.landlordId.toString() === req.user?.id) {
+          await MeterFeedback.create({
+            readingId: reading._id,
+            roomId,
+            landlordId: req.user?.id,
+            tenantId: room.tenantId,
+            status: 'pending',
+          })
+        }
+      } catch (e) { /* silent */ }
+    }
   } catch (error) {
     console.error('Upload meter image error:', error)
     res.status(500).json({ error: 'Failed to process image' })
@@ -110,6 +149,28 @@ export const addManualReading = async (req: AuthRequest, res: Response) => {
     const { value, date, notes, roomId } = req.body
     
     const readingDate = date ? new Date(date) : new Date()
+
+    // If tenant is assigned to a room, block them from entering readings
+    const currentUser = await User.findById(req.user?.id)
+    if (currentUser?.role === 'tenant') {
+      const tenantRoom = await Room.findOne({ tenantId: req.user?.id })
+      if (tenantRoom) {
+        return res.status(403).json({ error: 'Chỉ chủ trọ mới được nhập chỉ số điện. Bạn có thể xem chỉ số tại trang chủ.' })
+      }
+    }
+
+    // Validate room access if roomId provided
+    if (roomId) {
+      const roomCheck = await Room.findById(roomId)
+      if (!roomCheck) {
+        return res.status(404).json({ error: 'Phòng không tồn tại' })
+      }
+      // Only landlord of the room can add manual readings
+      const isLandlord = roomCheck.landlordId.toString() === req.user?.id
+      if (!isLandlord) {
+        return res.status(403).json({ error: 'Chỉ chủ trọ mới được nhập chỉ số điện cho phòng' })
+      }
+    }
 
     // Get previous reading to calculate consumption
     // Priority: Find by roomId if available, otherwise by userId
@@ -123,11 +184,9 @@ export const addManualReading = async (req: AuthRequest, res: Response) => {
         electricityRate = room.electricityRate
       }
       
-      // Find latest reading for this room before the current reading date
-      previousReading = await MeterReading.findOne({ 
-        roomId,
-        createdAt: { $lt: readingDate }
-      }).sort({ createdAt: -1 })
+      // Find latest reading for this room
+      previousReading = await MeterReading.findOne({ roomId })
+        .sort({ _id: -1 })
     } else {
       // Get user's electricity rate
       const user = await User.findById(req.user?.id)
@@ -135,11 +194,9 @@ export const addManualReading = async (req: AuthRequest, res: Response) => {
         electricityRate = user.electricityRate
       }
       
-      // Fallback: find by userId before the current reading date
-      previousReading = await MeterReading.findOne({ 
-        userId: req.user?.id,
-        createdAt: { $lt: readingDate }
-      }).sort({ createdAt: -1 })
+      // Fallback: find by userId
+      previousReading = await MeterReading.findOne({ userId: req.user?.id })
+        .sort({ _id: -1 })
     }
 
     let consumption = 0
@@ -162,6 +219,22 @@ export const addManualReading = async (req: AuthRequest, res: Response) => {
     })
 
     res.json({ reading })
+
+    // Auto-create feedback if landlord adds manual reading for a room with tenant
+    if (roomId) {
+      try {
+        const room = await Room.findById(roomId)
+        if (room && room.tenantId && room.landlordId.toString() === req.user?.id) {
+          await MeterFeedback.create({
+            readingId: reading._id,
+            roomId,
+            landlordId: req.user?.id,
+            tenantId: room.tenantId,
+            status: 'pending',
+          })
+        }
+      } catch (e) { /* silent */ }
+    }
   } catch (error) {
     console.error('Add manual reading error:', error)
     res.status(500).json({ error: 'Failed to add reading' })
@@ -252,12 +325,15 @@ export const deleteReading = async (req: AuthRequest, res: Response) => {
     
     // Check permission
     const isOwner = reading.userId.toString() === userId
-    const isLandlord = user?.role === 'landlord'
+    let isRoomLandlord = false
+    if (user?.role === 'landlord' && reading.roomId) {
+      const room = await Room.findById(reading.roomId)
+      isRoomLandlord = room?.landlordId.toString() === userId
+    }
     
-    // Tenant can only delete their own readings
-    // Landlord can delete any readings
-    if (!isOwner && !isLandlord) {
-      return res.status(403).json({ error: 'You can only delete your own readings' })
+    // Only owner or room's landlord can delete
+    if (!isOwner && !isRoomLandlord) {
+      return res.status(403).json({ error: 'Bạn không có quyền xóa chỉ số này' })
     }
 
     await MeterReading.findByIdAndDelete(id)
@@ -286,11 +362,15 @@ export const updateReading = async (req: AuthRequest, res: Response) => {
     
     // Check permission
     const isOwner = reading.userId.toString() === userId
-    const isLandlord = user?.role === 'landlord'
+    let isRoomLandlord = false
+    if (isLandlord && reading.roomId) {
+      const room = await Room.findById(reading.roomId)
+      isRoomLandlord = room?.landlordId.toString() === userId
+    }
     
-    // Only owner or landlord can update
-    if (!isOwner && !isLandlord) {
-      return res.status(403).json({ error: 'You can only update your own readings' })
+    // Only owner or room's landlord can update
+    if (!isOwner && !isRoomLandlord) {
+      return res.status(403).json({ error: 'Bạn không có quyền sửa chỉ số này' })
     }
 
     // If this was an OCR reading and user is correcting it, save for training

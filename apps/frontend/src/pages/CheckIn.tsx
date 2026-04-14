@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Calendar, Gift, Sparkles, TreeDeciduous, Award, Droplets } from 'lucide-react';
+import { Calendar, Gift, Sparkles, TreeDeciduous, Award, Droplets, Leaf } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 import CalendarTracker from '../components/CalendarTracker';
@@ -17,6 +17,8 @@ export default function CheckIn() {
   const [showWatering, setShowWatering] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [co2Stats, setCo2Stats] = useState<any>(null);
+  const [co2Message, setCo2Message] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCheckInStatus();
@@ -26,6 +28,9 @@ export default function CheckIn() {
     try {
       const response = await api.get('/checkin/status');
       setCheckInData(response.data);
+      if (response.data.co2Stats) {
+        setCo2Stats(response.data.co2Stats);
+      }
     } catch (error: any) {
       toast.error('Không thể tải trạng thái điểm danh');
     } finally {
@@ -42,6 +47,15 @@ export default function CheckIn() {
       try {
         const response = await api.post('/checkin/check-in');
         toast.success(response.data.message);
+        
+        if (response.data.co2Message) {
+          setCo2Message(response.data.co2Message);
+          // Auto-hide after 8 seconds
+          setTimeout(() => setCo2Message(null), 8000);
+        }
+        if (response.data.co2Stats) {
+          setCo2Stats(response.data.co2Stats);
+        }
         
         if (response.data.voucherCreated && response.data.voucher) {
           // Show voucher modal with the new voucher
@@ -151,6 +165,34 @@ export default function CheckIn() {
             : `Tưới cây ${TARGET_DAYS} lần để nhận voucher. Đã tưới ${streak} lần.`}
         </p>
       </div>
+
+      {/* CO2 Message Banner */}
+      {co2Message && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center animate-fade-in">
+          <p className="text-sm sm:text-base text-green-800 font-medium">{co2Message}</p>
+        </div>
+      )}
+
+      {/* CO2 Impact Stats */}
+      {co2Stats && co2Stats.co2Reduced > 0 && (
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-green-100">
+            <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 mx-auto mb-1" />
+            <div className="text-lg sm:text-xl font-bold text-green-700">{co2Stats.electricitySaved}</div>
+            <div className="text-[10px] sm:text-xs text-green-600">kWh tiết kiệm</div>
+          </div>
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-blue-100">
+            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mx-auto mb-1" />
+            <div className="text-lg sm:text-xl font-bold text-blue-700">{co2Stats.co2Reduced}</div>
+            <div className="text-[10px] sm:text-xs text-blue-600">kg CO₂ giảm</div>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-emerald-100">
+            <TreeDeciduous className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 mx-auto mb-1" />
+            <div className="text-lg sm:text-xl font-bold text-emerald-700">{co2Stats.treeEquivalent}</div>
+            <div className="text-[10px] sm:text-xs text-emerald-600">cây xanh tương đương</div>
+          </div>
+        </div>
+      )}
 
       {/* 3D Tree */}
       <div className="max-w-lg mx-auto mb-4 sm:mb-6 px-2">

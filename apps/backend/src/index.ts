@@ -13,6 +13,7 @@ import checkinRoutes from './routes/checkin.routes.js'
 import voucherRoutes from './routes/voucher.routes.js'
 import paymentRoutes from './routes/payment.routes.js'
 import ocrTrainingRoutes from './routes/ocrTraining.routes.js'
+import meterFeedbackRoutes from './routes/meterFeedback.routes.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import { config } from './config/index.js'
 import { connectDatabase } from './config/database.js'
@@ -45,6 +46,7 @@ app.use('/api/checkin', checkinRoutes)
 app.use('/api/vouchers', voucherRoutes)
 app.use('/api/payment', paymentRoutes)
 app.use('/api/ocr-training', ocrTrainingRoutes)
+app.use('/api/meter-feedback', meterFeedbackRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'GreenEnergy AI API is running' })

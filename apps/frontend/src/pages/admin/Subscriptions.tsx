@@ -27,9 +27,9 @@ export default function AdminSubscriptions() {
         'Lịch sử không giới hạn',
         'Chụp ảnh đồng hồ (OCR)',
         'Biểu đồ phân tích',
-        '🤖 AI Chatbot',
-        '🤖 AI phân tích tiêu thụ',
-        '⚠️ Phát hiện bất thường'
+        'AI Chatbot',
+        'AI phân tích tiêu thụ',
+        'Phát hiện bất thường'
       ],
       popular: false,
       userCount: 0
@@ -46,7 +46,7 @@ export default function AdminSubscriptions() {
         'Quản lý người thuê',
         'Lịch sử chỉ số điện',
         'Chụp ảnh đồng hồ (OCR)',
-        '🤖 AI Chatbot hỗ trợ'
+        'AI Chatbot hỗ trợ'
       ],
       popular: false,
       userCount: 0
@@ -60,8 +60,8 @@ export default function AdminSubscriptions() {
         'Quản lý tối đa 20 phòng',
         'Tất cả tính năng Starter',
         'Biểu đồ phân tích',
-        '🤖 AI phân tích tiêu thụ',
-        '⚠️ Phát hiện bất thường',
+        'AI phân tích tiêu thụ',
+        'Phát hiện bất thường',
         'Báo cáo chi tiết'
       ],
       popular: true,
@@ -77,9 +77,9 @@ export default function AdminSubscriptions() {
         'Tất cả tính năng Professional',
         'Quản lý không giới hạn người thuê',
         'Xem tất cả lịch sử',
-        '📄 Xuất hóa đơn PDF',
-        '📄 Xuất báo cáo PDF',
-        '💬 Chat trực tiếp với admin',
+        'Xuất hóa đơn PDF',
+        'Xuất báo cáo PDF',
+        'Chat trực tiếp với admin',
         'Hỗ trợ ưu tiên'
       ],
       popular: false,

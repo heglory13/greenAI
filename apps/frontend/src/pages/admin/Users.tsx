@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Search, Trash2, Eye, CreditCard, X } from 'lucide-react'
+import { Search, Trash2, Eye, CreditCard, X, Download } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
 import toast from 'react-hot-toast'
+import { exportToCSV } from '@/utils/exportExcel'
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([])
@@ -168,7 +169,22 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Quản Lý Người Dùng</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Quản Lý Người Dùng</h2>
+        <button
+          onClick={() => exportToCSV(users, 'nguoi-dung', [
+            { key: 'name', label: 'Tên' },
+            { key: 'email', label: 'Email' },
+            { key: 'role', label: 'Vai trò' },
+            { key: 'subscriptionPlan', label: 'Gói dịch vụ' },
+            { key: 'createdAt', label: 'Ngày tạo' },
+          ])}
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs sm:text-sm font-medium"
+        >
+          <Download size={16} />
+          Xuất Excel
+        </button>
+      </div>
 
       <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">

@@ -58,8 +58,8 @@ app.use(errorHandler)
 connectDatabase()
 
 // Start server (for Railway, Render, etc.)
-const PORT = config.port || process.env.PORT || 3000
-app.listen(PORT, () => {
+const PORT = process.env.PORT || config.port || 3000
+app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`🚀 GreenEnergy AI Server running on port ${PORT}`)
   console.log(`📝 Environment: ${config.nodeEnv}`)
   console.log(`📁 Upload directory: ${config.upload.dir}`)

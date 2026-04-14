@@ -8,6 +8,7 @@ export interface AuthRequest extends Request {
     email: string
     role: string
   }
+  file?: any
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {

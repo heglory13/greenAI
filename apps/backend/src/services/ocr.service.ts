@@ -1,182 +1,156 @@
 import Tesseract from 'tesseract.js'
 import path from 'path'
 import fs from 'fs'
+import Groq from 'groq-sdk'
 import OCRTraining from '../models/OCRTraining.model.js'
 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' })
+
 export class OCRService {
-  // Cache training patterns in memory for faster lookup
   private static trainingPatterns: Map<string, number> = new Map()
   private static lastTrainingLoad = 0
-  private static CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+  private static CACHE_DURATION = 5 * 60 * 1000
 
   static async loadTrainingPatterns() {
     const now = Date.now()
-    // Reload training data every 5 minutes
-    if (now - this.lastTrainingLoad < this.CACHE_DURATION && this.trainingPatterns.size > 0) {
-      return
-    }
-
+    if (now - this.lastTrainingLoad < this.CACHE_DURATION && this.trainingPatterns.size > 0) return
     try {
       const trainingData = await OCRTraining.find().limit(1000)
       this.trainingPatterns.clear()
-      
       trainingData.forEach(data => {
-        if (data.rawText) {
-          // Store pattern: rawText -> correctValue
-          const key = data.rawText.trim().toLowerCase()
-          this.trainingPatterns.set(key, data.correctValue)
-        }
+        if (data.rawText) this.trainingPatterns.set(data.rawText.trim().toLowerCase(), data.correctValue)
       })
-      
       this.lastTrainingLoad = now
-      console.log(`📚 Loaded ${this.trainingPatterns.size} OCR training patterns`)
+      console.log(`Loaded ${this.trainingPatterns.size} OCR training patterns`)
     } catch (error) {
       console.error('Failed to load training patterns:', error)
     }
   }
 
-  static async extractMeterReading(imagePath: string): Promise<{ value: number; confidence: number; rawText?: string }> {
+  // Primary: Use Groq Vision AI to read meter
+  static async readMeterWithAI(imagePath: string): Promise<{ value: number; confidence: number; rawText?: string } | null> {
     try {
       const absolutePath = path.resolve(imagePath)
-      
-      // Check if file exists
-      if (!fs.existsSync(absolutePath)) {
-        console.error('❌ File not found:', absolutePath)
-        return {
-          value: 0,
-          confidence: 0
+      const imageBuffer = fs.readFileSync(absolutePath)
+      const base64Image = imageBuffer.toString('base64')
+      const mimeType = imagePath.endsWith('.png') ? 'image/png' : 'image/jpeg'
+
+      const completion = await groq.chat.completions.create({
+        model: 'llama-3.2-90b-vision-preview',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image_url',
+                image_url: { url: `data:${mimeType};base64,${base64Image}` }
+              },
+              {
+                type: 'text',
+                text: 'This is a photo of an electricity meter. Read ONLY the main kWh counter display (the row of numbers showing total electricity consumption). Ignore serial numbers, model numbers, and other text. Return ONLY the number, nothing else. For example: 5051'
+              }
+            ]
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 50,
+      })
+
+      const response = completion.choices[0]?.message?.content?.trim() || ''
+      console.log('AI Vision response:', response)
+
+      // Extract number from response
+      const match = response.match(/\d+/)
+      if (match) {
+        const value = parseInt(match[0])
+        if (value >= 0 && value < 999999) {
+          console.log('AI Vision reading:', value)
+          return { value, confidence: 0.92, rawText: `AI: ${response}` }
         }
       }
-      
-      console.log('🔍 Starting OCR for:', absolutePath)
-      
-      // Load training patterns
+      return null
+    } catch (error: any) {
+      console.error('AI Vision OCR failed:', error.message)
+      return null
+    }
+  }
+
+  // Fallback: Tesseract OCR
+  static async readMeterWithTesseract(imagePath: string): Promise<{ value: number; confidence: number; rawText?: string }> {
+    try {
+      const absolutePath = path.resolve(imagePath)
+      if (!fs.existsSync(absolutePath)) {
+        return { value: 0, confidence: 0 }
+      }
+
       await this.loadTrainingPatterns()
-      
-      // Use Tesseract with optimized settings for meter readings
-      const result = await Tesseract.recognize(
-        absolutePath,
-        'eng',
-        {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`)
-            }
-          },
-          // Add error handler
-          errorHandler: (err) => {
-            console.error('OCR Error during processing:', err.message)
+
+      const result = await Tesseract.recognize(absolutePath, 'eng', {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`)
           }
         }
-      )
+      })
 
       const text = result.data.text.trim()
-      console.log('📝 OCR Raw Text:', text)
-      console.log('📊 OCR Confidence:', result.data.confidence)
+      console.log('Tesseract Raw Text:', text)
 
-      // Check if we've seen this exact text before in training data
+      // Check training patterns
       const textKey = text.toLowerCase()
       if (this.trainingPatterns.has(textKey)) {
         const learnedValue = this.trainingPatterns.get(textKey)!
-        console.log('🎓 Found learned pattern! Using trained value:', learnedValue)
-        return {
-          value: learnedValue,
-          confidence: 0.95, // High confidence for learned patterns
-          rawText: text
-        }
+        return { value: learnedValue, confidence: 0.95, rawText: text }
       }
 
-      // If text is empty or confidence too low, return error
       if (!text || text.length === 0) {
-        console.log('⚠️ OCR returned empty text')
-        return {
-          value: 0,
-          confidence: 0
-        }
+        return { value: 0, confidence: 0 }
       }
 
-      // Extract numbers from original text (before cleaning)
-      // This preserves word boundaries and handles numbers with leading zeros
-      const numbersFromOriginal = text.match(/\d+\.?\d*/g) || []
-      
-      console.log('🔢 Numbers from original text:', numbersFromOriginal)
-      
-      // Also try to find sequences that look like meter readings
-      // Look for 5-6 consecutive digits (common for Vietnamese meters)
-      const meterPattern = /\b\d{4,6}\b/g
-      const meterLikeNumbers = text.match(meterPattern) || []
-      console.log('🎯 Meter-like patterns (4-6 digits):', meterLikeNumbers)
-      
-      // Combine both approaches
-      const allNumbers = [...new Set([...numbersFromOriginal, ...meterLikeNumbers])]
-      console.log('📋 All unique numbers:', allNumbers)
-
-      // Parse all numbers and filter valid readings
+      // Extract numbers
+      const allNumbers = text.match(/\d+\.?\d*/g) || []
       const readings = allNumbers
         .map(n => parseFloat(n))
-        .filter(n => !isNaN(n) && n >= 10 && n < 999999) // Reasonable meter reading range (at least 2 digits)
-        .sort((a, b) => b - a) // Sort descending
-
-      console.log('✅ Valid readings:', readings)
+        .filter(n => !isNaN(n) && n >= 10 && n < 999999)
+        .sort((a, b) => b - a)
 
       if (readings.length === 0) {
-        console.log('⚠️ No valid readings found')
-        return {
-          value: 0,
-          confidence: 0
-        }
+        return { value: 0, confidence: 0 }
       }
 
-      // Strategy: Prioritize numbers that look like meter readings
-      // Vietnamese electric meters typically show 5-6 digits
+      // Prefer 4-6 digit numbers (meter readings)
       let value = readings[0]
-      
-      // Prefer numbers with 4-6 digits (most common for electric meters)
-      const meterLikeReadings = readings.filter(n => n >= 1000 && n <= 999999)
-      if (meterLikeReadings.length > 0) {
-        // If we have multiple candidates, prefer the one with 5-6 digits
-        const fiveToSixDigits = meterLikeReadings.filter(n => n >= 10000 && n <= 999999)
-        if (fiveToSixDigits.length > 0) {
-          value = fiveToSixDigits[0]
-          console.log('🎯 Selected 5-6 digit reading:', value)
-        } else {
-          value = meterLikeReadings[0]
-          console.log('🎯 Selected 4+ digit reading:', value)
-        }
-      } else {
-        console.log('⚠️ Using fallback reading:', value)
+      const meterLike = readings.filter(n => n >= 1000 && n <= 999999)
+      if (meterLike.length > 0) {
+        const fiveToSix = meterLike.filter(n => n >= 10000)
+        value = fiveToSix.length > 0 ? fiveToSix[0] : meterLike[0]
       }
 
-      // Get confidence from OCR result (0-100 scale)
       const confidence = result.data.confidence / 100
-
-      console.log('✅ Final OCR Result:', { 
-        value, 
-        confidence: confidence.toFixed(2),
-        allReadings: readings 
-      })
-
       return {
-        value: Math.round(value), // Round to integer for meter readings
-        confidence: Math.max(0.3, Math.min(1, confidence)), // Clamp between 0.3 and 1
-        rawText: text // Return raw text for training
+        value: Math.round(value),
+        confidence: Math.max(0.3, Math.min(1, confidence)),
+        rawText: text
       }
-    } catch (error: any) {
-      console.error('❌ OCR Error:', error)
-      
-      // Handle specific errors
-      if (error.message && error.message.includes('Image too small')) {
-        console.error('Image is too small for OCR processing')
-        return {
-          value: 0,
-          confidence: 0
-        }
-      }
-      
-      return {
-        value: 0,
-        confidence: 0
-      }
+    } catch (error) {
+      console.error('Tesseract OCR Error:', error)
+      return { value: 0, confidence: 0 }
     }
+  }
+
+  // Main method: try AI first, fallback to Tesseract
+  static async extractMeterReading(imagePath: string): Promise<{ value: number; confidence: number; rawText?: string }> {
+    console.log('Starting OCR for:', imagePath)
+
+    // Try AI Vision first
+    const aiResult = await this.readMeterWithAI(imagePath)
+    if (aiResult && aiResult.value > 0) {
+      console.log('Using AI Vision result:', aiResult.value)
+      return aiResult
+    }
+
+    // Fallback to Tesseract
+    console.log('AI Vision failed, falling back to Tesseract...')
+    return this.readMeterWithTesseract(imagePath)
   }
 }
